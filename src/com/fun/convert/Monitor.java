@@ -9,8 +9,7 @@ import javax.swing.*;
 
 public class Monitor implements ActionListener {
 	static Monitor monitor;
-	private int count = 0;
-	static File currentf;
+	private static File currentf;
 	static {
 		monitor = new Monitor();		
 		currentf = new File(ClassLoader.getSystemClassLoader().getResource(".").getPath());
@@ -45,6 +44,11 @@ public class Monitor implements ActionListener {
 				Panel.textArea.append("\n取消打开");
 			break;
 		case "removeFile":
+		    if(Panel.thread!=null&&Panel.thread.isAlive()){
+		        Panel.thread.interrupt();
+                Convert.isStop=true;
+                Panel.resetGui();
+            }
 			List<File> selecedIndexs = Panel.jlist.getSelectedValuesList();
 			// System.out.println(selecedIndexs);
 
@@ -66,26 +70,31 @@ public class Monitor implements ActionListener {
 				Panel.b2.setEnabled(false);
 				Panel.b3.setEnabled(false);
 			}
-			Panel.progressBar.setString("wait excute");
+            Panel.resetGui();
 			break;
 		case "removeAll":
+            if(Panel.thread!=null&&Panel.thread.isAlive()){
+                Panel.thread.interrupt();
+                Convert.isStop=true;
+                Panel.resetGui();
+            }
 			FileBean.setSelectFiles(null);
 			Panel.jlist.setListData(FileBean.getSelectFiles());
 			Panel.b2.setEnabled(false);
 			Panel.b3.setEnabled(false);
-			Panel.progressBar.setString("wait excute");
+            Panel.resetGui();
 			break;
 		case "convert":
 			int[] i = Convert.isRightEncoding((String) Panel.comboBox1.getSelectedItem(), FileBean.getSelectArray());
 			if (i.length > 0) {
 				Panel.jlist.setSelectedIndices(i);
+                Panel.progressBar.setString("waiting...");
 				Object[] options = { "确定", "取消" };
 				int response = JOptionPane.showOptionDialog(Panel.frame,
 						"注意！列表有文件不是当前编码（猜测），\n如果预览的是乱码请不要转换，转码有很大几率乱码，\n确认以当前编码转码吗？", "确认转码？", JOptionPane.YES_OPTION,
 						JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 				if (response == 0) {
-					System.out.println("您按下了第OK按钮 ");
 					new Thread(() -> {
 						start();
 
@@ -116,8 +125,8 @@ public class Monitor implements ActionListener {
 		}
 	}
 
+
 	private void start() {
-		int step = FileBean.getSelectFiles().length / 100;
 		File[] f = FileBean.getSelectFiles();
 		for (int i = 0; i < f.length; i++) {
 			try {
@@ -127,18 +136,6 @@ public class Monitor implements ActionListener {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			count = i * step;
-			if (i == f.length - 1) {
-				count = 100;
-			}
-			//SwingUtilities.invokeLater(() -> {
-				Panel.progressBar.setString("转换中");
-				if (count == 100) {
-					Panel.progressBar.setString("完成");
-				} else {
-					Panel.progressBar.setValue(count);
-				}
-			//});
 		}
 	}
 
