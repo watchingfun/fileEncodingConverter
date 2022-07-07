@@ -115,7 +115,6 @@ public class Monitor implements ActionListener {
 					System.out.println("您按下了第OK按钮 ");
 					new Thread(() -> {
 						start();
-
 					}).start();
 				} else if (response == 1) {
 					Panel.textArea.setText("用户取消转码");

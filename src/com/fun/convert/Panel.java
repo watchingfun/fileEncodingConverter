@@ -24,17 +24,14 @@ public class Panel {
 
     public static void main(String[] args) {
         // 显示应用 GUI
-        new Thread(() -> {
-            // do some things
-            SwingUtilities.invokeLater(() -> {
-                // update gui
-                WebLookAndFeel.globalControlFont = new FontUIResource("微软雅黑", 0, 14);
-                WebLookAndFeel.install();
-                WebLookAndFeel.initializeManagers();
-                Panel panel = new Panel();
-                panel.initGUI();
-            });
-        }).start();
+        SwingUtilities.invokeLater(() -> {
+            // update gui
+            WebLookAndFeel.globalControlFont = new FontUIResource("微软雅黑", 0, 14);
+            WebLookAndFeel.install();
+            WebLookAndFeel.initializeManagers();
+            Panel panel = new Panel();
+            panel.initGUI();
+        });
     }
 
     private void initGUI() {
